@@ -1,0 +1,127 @@
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+
+from app.database import get_db
+from app.models.profile import Profile
+from app.schemas.profile import ProfileCreate, ProfileResponse
+from fastapi import UploadFile, File
+from app.services.upload_service import save_image
+
+
+router = APIRouter(
+    prefix="/profile",
+    tags=["Profile"]
+)
+
+
+@router.get("/", response_model=ProfileResponse)
+def get_profile(db: Session = Depends(get_db)):
+    profile = db.query(Profile).first()
+    return profile
+
+
+@router.post("/", response_model=ProfileResponse)
+def save_profile(
+    profile: ProfileCreate,
+    db: Session = Depends(get_db)
+):
+
+    
+
+    # Check if a profile already exists
+    existing_profile = db.query(Profile).first()
+
+    if existing_profile:
+        # Update existing profile
+        existing_profile.store_name = profile.store_name
+        existing_profile.logo_type = profile.logo_type
+        existing_profile.facebook = profile.facebook
+        existing_profile.instagram = profile.instagram
+        existing_profile.tiktok = profile.tiktok
+        existing_profile.twitter = profile.twitter
+
+        db.commit()
+        db.refresh(existing_profile)
+
+        return existing_profile
+
+    # Create new profile
+    new_profile = Profile(
+        store_name=profile.store_name,
+        logo_type=profile.logo_type,
+        facebook=profile.facebook,
+        instagram=profile.instagram,
+        tiktok=profile.tiktok,
+        twitter=profile.twitter,
+    )
+
+    db.add(new_profile)
+    db.commit()
+    db.refresh(new_profile)
+
+    return new_profile
+
+
+@router.post("/logo")
+def upload_logo(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db)
+):
+    # Save image inside app/uploads
+    filename = save_image(file)
+
+    # Find existing profile
+    profile = db.query(Profile).first()
+
+    if profile:
+        profile.logo = filename
+        db.commit()
+        db.refresh(profile)
+    else:
+        profile = Profile(
+            store_name="",
+            logo_type="image",
+            logo=filename,
+            hero_image="",
+            facebook="",
+            instagram="",
+            tiktok="",
+            twitter=""
+        )
+
+        db.add(profile)
+        db.commit()
+        db.refresh(profile)
+
+    return {
+        "message": "Logo uploaded successfully",
+        "filename": filename,
+        "url": f"/uploads/{filename}"
+    }
+
+
+@router.post("/hero")
+def upload_hero(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db)
+):
+    filename = save_image(file)
+
+    profile = db.query(Profile).first()
+
+    if not profile:
+        profile = Profile()
+        db.add(profile)
+
+    profile.hero_image = filename
+
+    db.commit()
+
+    return {
+        "message": "Hero image uploaded successfully",
+        "filename": filename,
+        "url": f"/uploads/{filename}"
+    }
+
+
+

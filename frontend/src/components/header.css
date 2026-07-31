@@ -1,0 +1,93 @@
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: purple;
+  z-index: 1000;
+}
+
+.container {
+  width: 1200px;
+  max-width: 95%;
+  margin: 0 auto;
+}
+
+nav {
+  height: 80px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+nav h1 {
+  color: #f6c400;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+/* Desktop Links */
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 35px;
+}
+
+.nav-links a {
+  color: #f6c400;
+  font-size: 18px;
+  font-weight: 600;
+  transition: .3s;
+}
+
+.nav-links a:hover {
+  color: white;
+}
+
+/* Menu Button */
+
+.menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: #f6c400;
+  font-size: 30px;
+  cursor: pointer;
+}
+
+/* Mobile Menu */
+
+.mobile-menu {
+  display: none;
+}
+
+@media (max-width:768px) {
+
+  .nav-links {
+    display: none;
+  }
+
+  .menu-btn {
+    display: block;
+  }
+
+  .mobile-menu {
+    display: flex;
+    flex-direction: column;
+    background: purple;
+    width: 100%;
+  }
+
+  .mobile-menu a {
+    color: #f6c400;
+    padding: 18px;
+    text-align: center;
+    border-top: 1px solid rgba(255,255,255,.2);
+    font-weight: bold;
+  }
+
+  .mobile-menu a:hover {
+    background: rgba(255,255,255,.1);
+  }
+}

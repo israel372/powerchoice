@@ -1,9 +1,21 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+
+from app.database import Base, engine
+from app.routes import profile, product
+
+
 
 app = FastAPI(
     title="PowerChoice API",
     version="1.0.0"
+)
+
+app.mount(
+    "/uploads",
+    StaticFiles(directory="app/uploads"),
+    name="uploads"
 )
 
 origins = [
@@ -18,6 +30,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Create database tables
+Base.metadata.create_all(bind=engine)
+
+
+# Register API routes
+app.include_router(profile.router)
+app.include_router(product.router)
 
 
 @app.get("/")
