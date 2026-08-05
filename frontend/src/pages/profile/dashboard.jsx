@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import "./dashboard.css";
-import { getProfile, saveProfile,uploadLogo,uploadHero,uploadProductImage,createProduct,getProducts, } from "../../api/api";
+import { getProfile, saveProfile,uploadLogo,uploadHero,uploadProductImage,createProduct,getProducts,deleteProduct,updateProduct,createReview,getReviews, updateReview,deleteReview, } from "../../api/api";
 
 function Dashboard() {
   const [profile, setProfile] = useState({
@@ -8,11 +8,23 @@ function Dashboard() {
   logo_type: "text",
   logo: "",
   hero_image: "",
+
   facebook: "",
   instagram: "",
   tiktok: "",
   twitter: "",
+
+  email: "",
+  phone: "",
+  address: "",
+  whatsapp: "",
+
+  ceo_name: "",
+  tagline: "",
+  description: "",
 });
+
+
 
 const [product, setProduct] = useState({
   name: "",
@@ -20,11 +32,25 @@ const [product, setProduct] = useState({
   description: "",
   image: "",
 });
+
+
+const [review, setReview] = useState({
+  customer_name: "",
+  comment: "",
+  rating: 5,
+});
+
+const [reviews, setReviews] = useState([]);
+const [showReviewForm, setShowReviewForm] = useState(false);
+const [editingReviewId, setEditingReviewId] = useState(null);
 const [products, setProducts] = useState([]);
+const [showProductForm, setShowProductForm] = useState(false);
+const [editingProductId, setEditingProductId] = useState(null);
 
 useEffect(() => {
   loadProfile();
   loadProducts();
+   loadReviews();
 }, []);
 
 async function loadProfile() {
@@ -41,14 +67,35 @@ async function loadProfile() {
     console.log("No profile found yet.");
   }
 }
+
+
+
+
+
 async function loadProducts() {
   try {
     const data = await getProducts();
+
+    console.log("Products:", data);
+
     setProducts(data);
   } catch (error) {
     console.error(error);
   }
 }
+
+
+async function loadReviews() {
+  try {
+    const data = await getReviews();
+    setReviews(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+
+
 
 async function handleSave() {
   try {
@@ -59,6 +106,9 @@ async function handleSave() {
     alert("Failed to save profile.");
   }
 }
+
+
+
 
 async function handleLogoUpload(e) {
   const file = e.target.files[0];
@@ -81,6 +131,10 @@ async function handleLogoUpload(e) {
   }
 }
 
+
+
+
+
 async function handleHeroUpload(e) {
   const file = e.target.files[0];
 
@@ -100,6 +154,11 @@ async function handleHeroUpload(e) {
     alert("Hero image upload failed.");
   }
 }
+
+
+
+
+
 
 async function handleProductImageUpload(e) {
   const file = e.target.files[0];
@@ -121,11 +180,21 @@ async function handleProductImageUpload(e) {
   }
 }
 
+
+
+
+
 async function handleSaveProduct() {
   try {
-    await createProduct(product);
+    if (editingProductId) {
+      await updateProduct(editingProductId, product);
 
-    alert("Product created successfully!");
+      alert("Product updated successfully!");
+    } else {
+      await createProduct(product);
+
+      alert("Product created successfully!");
+    }
 
     setProduct({
       name: "",
@@ -134,15 +203,99 @@ async function handleSaveProduct() {
       image: "",
     });
 
-    // reload products from database
+    setEditingProductId(null);
+    setShowProductForm(false);
+
     loadProducts();
 
   } catch (error) {
     console.error(error);
-    alert("Failed to create product.");
+    alert("Operation failed.");
   }
 }
-  return (
+
+function handleEditProduct(product) {
+  alert("Editing: " + product.name);
+}
+
+
+
+
+async function handleDeleteProduct(id) {
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete this product?"
+  );
+
+  if (!confirmDelete) return;
+
+  try {
+    await deleteProduct(id);
+
+    alert("Product deleted successfully!");
+
+    loadProducts();
+  } catch (error) {
+    console.error(error);
+    alert("Failed to delete product.");
+  }
+}
+
+async function handleSaveReview() {
+  try {
+    if (editingReviewId) {
+      await updateReview(editingReviewId, review);
+      alert("Review updated successfully!");
+    } else {
+      await createReview(review);
+      alert("Review created successfully!");
+    }
+
+    setReview({
+      customer_name: "",
+      comment: "",
+      rating: 5,
+    });
+
+    setEditingReviewId(null);
+    setShowReviewForm(false);
+
+    loadReviews();
+  } catch (error) {
+    console.error(error);
+    alert("Operation failed.");
+  }
+}
+
+
+function handleEditReview(item) {
+  setReview(item);
+  setEditingReviewId(item.id);
+  setShowReviewForm(true);
+}
+
+
+async function handleDeleteReview(id) {
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete this review?"
+  );
+
+  if (!confirmDelete) return;
+
+  try {
+    await deleteReview(id);
+
+    alert("Review deleted successfully!");
+
+    loadReviews();
+  } catch (error) {
+    console.error(error);
+    alert("Failed to delete review.");
+  }
+}
+
+
+
+return (
     <div className="profile-page">
       <div className="profile-container">
 
@@ -206,8 +359,24 @@ async function handleSaveProduct() {
                       })
                     }
                   />
-                Image Logo
+                Image 
               </label>
+              
+              <label>
+                      <input
+                        type="radio"
+                        name="logo_type"
+                        value="both"
+                        checked={profile.logo_type === "both"}
+                        onChange={(e) =>
+                          setProfile({
+                            ...profile,
+                            logo_type: e.target.value,
+                          })
+                        }
+                      />
+                      Both
+                    </label>
             </div>
 
             <label>Store Name</label>
@@ -250,109 +419,227 @@ async function handleSaveProduct() {
           </div>
 
           {/* Hero */}
+<div className="settings-card">
 
-          <div className="settings-card">
+  <h2>Hero Image</h2>
 
-            <h2>Hero Image</h2>
+  <label>Current Hero</label>
 
-            <label>Current Hero</label>
+  <div className="image-preview">
+    {profile.hero_image ? (
+      <img
+        src={`http://127.0.0.1:8000/uploads/${profile.hero_image}`}
+        alt="Hero"
+        className="preview-image"
+      />
+    ) : (
+      "Hero Image Preview"
+    )}
+  </div>
 
-            <div className="image-preview">
-                {profile.hero_image ? (
-                    <img
-                        src={`http://127.0.0.1:8000/uploads/${profile.hero_image}`}
-                        alt="Hero"
-                        className="preview-image"
-                    />
-                ) : (
-                    "Hero Image Preview"
-                )}
-            </div>
+  <label>Upload Hero Image</label>
 
-            <label>Upload Hero Image</label>
+  <input
+    type="file"
+    className="profile-input"
+    accept="image/*"
+    onChange={handleHeroUpload}
+  />
 
-            <input
-              type="file"
-              className="profile-input"
-              accept="image/*"
-              onChange={handleHeroUpload}
-            />
+</div>
 
-          </div>
+{/* Hero Content */}
+<div className="settings-card">
 
-        </div>
+  <h2>Hero Content</h2>
 
-        {/* Social */}
+  <label>CEO Name</label>
+  <input
+    className="profile-input"
+    placeholder="John Doe"
+    value={profile.ceo_name}
+    onChange={(e) =>
+      setProfile({
+        ...profile,
+        ceo_name: e.target.value,
+      })
+    }
+  />
 
-        <div className="settings-card social-card">
+  <label>Tagline</label>
+  <input
+    className="profile-input"
+    placeholder="Lighting Your World"
+    value={profile.tagline}
+    onChange={(e) =>
+      setProfile({
+        ...profile,
+        tagline: e.target.value,
+      })
+    }
+  />
 
-          <h2>Social Media Links</h2>
+  <label>Short Description</label>
+  <textarea
+    className="profile-textarea"
+    placeholder="Write a short description about your business..."
+    value={profile.description}
+    onChange={(e) =>
+      setProfile({
+        ...profile,
+        description: e.target.value,
+      })
+    }
+  />
 
-          <div className="social-grid">
+</div>
+</div>
 
-            <div>
-              <label>Facebook</label>
-              <input
-                  className="profile-input"
-                  placeholder="https://facebook.com/..."
-                  value={profile.facebook}
-                  onChange={(e) =>
-                    setProfile({
-                      ...profile,
-                      facebook: e.target.value,
-                    })
-                  }
-                />
-            </div>
+        {/* Social & Contact */}
 
-            <div>
-              <label>Instagram</label>
-              <input
-                  className="profile-input"
-                  placeholder="https://instagram.com/..."
-                  value={profile.instagram}
-                  onChange={(e) =>
-                    setProfile({
-                      ...profile,
-                      instagram: e.target.value,
-                    })
-                  }
-                />
-            </div>
+<div className="settings-card social-card">
 
-            <div>
-              <label>TikTok</label>
-              <input
-                  className="profile-input"
-                  placeholder="https://tiktok.com/..."
-                  value={profile.tiktok}
-                  onChange={(e) =>
-                    setProfile({
-                      ...profile,
-                      tiktok: e.target.value,
-                    })
-                  }
-                />
-            </div>
+  <h2>Social & Contact</h2>
 
-            <div>
-              <label>X (Twitter)</label>
-              <input
-                  className="profile-input"
-                  placeholder="https://x.com/..."
-                  value={profile.twitter}
-                  onChange={(e) =>
-                    setProfile({
-                      ...profile,
-                      twitter: e.target.value,
-                    })
-                  }
-                />
-            </div>
+  <div className="social-grid">
 
-          </div>
+    <div>
+      <label>Facebook</label>
+      <input
+        className="profile-input"
+        placeholder="https://facebook.com/..."
+        value={profile.facebook}
+        onChange={(e) =>
+          setProfile({
+            ...profile,
+            facebook: e.target.value,
+          })
+        }
+      />
+    </div>
 
-        </div>
+    <div>
+      <label>Instagram</label>
+      <input
+        className="profile-input"
+        placeholder="https://instagram.com/..."
+        value={profile.instagram}
+        onChange={(e) =>
+          setProfile({
+            ...profile,
+            instagram: e.target.value,
+          })
+        }
+      />
+    </div>
+
+    <div>
+      <label>TikTok</label>
+      <input
+        className="profile-input"
+        placeholder="https://tiktok.com/..."
+        value={profile.tiktok}
+        onChange={(e) =>
+          setProfile({
+            ...profile,
+            tiktok: e.target.value,
+          })
+        }
+      />
+    </div>
+
+    <div>
+      <label>X (Twitter)</label>
+      <input
+        className="profile-input"
+        placeholder="https://x.com/..."
+        value={profile.twitter}
+        onChange={(e) =>
+          setProfile({
+            ...profile,
+            twitter: e.target.value,
+          })
+        }
+      />
+    </div>
+
+    <div>
+      <label>WhatsApp Number</label>
+      <input
+        className="profile-input"
+        placeholder="2348012345678"
+        value={profile.whatsapp}
+        onChange={(e) =>
+          setProfile({
+            ...profile,
+            whatsapp: e.target.value,
+          })
+        }
+      />
+    </div>
+
+    <div>
+      <label>Email Address</label>
+      <input
+        type="email"
+        className="profile-input"
+        placeholder="example@gmail.com"
+        value={profile.email}
+        onChange={(e) =>
+          setProfile({
+            ...profile,
+            email: e.target.value,
+          })
+        }
+      />
+    </div>
+
+    <div>
+      <label>Phone Number</label>
+      <input
+        type="tel"
+        className="profile-input"
+        placeholder="+234 801 234 5678"
+        value={profile.phone}
+        onChange={(e) =>
+          setProfile({
+            ...profile,
+            phone: e.target.value,
+          })
+        }
+      />
+    </div>
+
+  </div>
+
+</div>
+
+
+
+       {/* ================= Contact & Connect footer  ================= */}
+
+<div className="settings-card">
+
+  <h2>Footer Settings</h2>
+
+  <label>Store Address</label>
+
+  <input
+    className="profile-input"
+    placeholder="Store Address"
+    value={profile.address}
+    onChange={(e) =>
+      setProfile({
+        ...profile,
+        address: e.target.value,
+      })
+    }
+  />
+
+</div>
+
+
+        
 
         {/* ================= Products ================= */}
 
@@ -365,9 +652,12 @@ async function handleSaveProduct() {
       <p>Add, edit and manage the products displayed in your store.</p>
     </div>
 
-    <button className="add-product-btn">
-      + Add Product
-    </button>
+    <button
+          className="add-product-btn"
+          onClick={() => setShowProductForm(true)}
+        >
+          + Add Product
+        </button>
 
   </div>
 
@@ -397,25 +687,62 @@ async function handleSaveProduct() {
 
         </div>
 
+         <div className="product-info">
+      <h3>{item.name}</h3>
 
-        <h3>{item.name}</h3>
+      <p className="product-price">
+        ₦{item.price}
+      </p>
 
-        <p>₦{item.price}</p>
+      <p className="product-description">
+        {item.description}
+      </p>
+    </div>
 
-        <p>{item.description}</p>
+            <div className="product-actions">
+
+          <button
+            className="edit-btn"
+            onClick={() => {
+              setProduct({
+                name: item.name,
+                price: item.price,
+                description: item.description,
+                image: item.image,
+              });
+
+              setEditingProductId(item.id);
+              setShowProductForm(true);
+            }}
+          >
+            Edit
+          </button>
+
+          <button
+            className="delete-btn"
+            onClick={() => handleDeleteProduct(item.id)}
+          >
+            Delete
+          </button>
+            </div>
+
+  </div>
+))}
 
 
-      </div>
-
-    ))}
-
+        
 
 
 
     {/* Add New Product Form */}
 
+{showProductForm && (
+
     <div className="empty-product">
 
+      <h3>
+        {editingProductId ? "Edit Product" : "Add Product"}
+      </h3>
 
       <div className="product-image">
 
@@ -434,6 +761,7 @@ async function handleSaveProduct() {
         )}
 
       </div>
+      
 
 
 
@@ -493,34 +821,185 @@ async function handleSaveProduct() {
       <div className="product-buttons">
 
 
-        <button className="cancel-btn">
-          Delete
-        </button>
+        <button
+            className="cancel-btn"
+            onClick={() => {
+              setShowProductForm(false);
 
+              setProduct({
+                name: "",
+                price: "",
+                description: "",
+                image: "",
+              });
+
+              setEditingProductId(null);
+            }}
+          >
+            Cancel
+          </button>
 
 
         <button
-          className="save-btn"
-          onClick={handleSaveProduct}
-        >
-          Save Product
-        </button>
-
+  className="save-btn"
+  onClick={handleSaveProduct}
+>
+  {editingProductId ? "Update Product" : "Save Product"}
+</button>
 
       </div>
 
-
     </div>
 
-
+)}
 
   </div>
 
+</div>
+
+{/* ================= Reviews ================= */}
+
+<div className="reviews-card">
+
+  <div className="products-header">
+
+    <h2>Reviews: {reviews.length}</h2>
+
+    <button
+      className="save-btn"
+      onClick={() => {
+        setShowReviewForm(!showReviewForm);
+        setEditingReviewId(null);
+
+        setReview({
+          customer_name: "",
+          comment: "",
+          rating: 5,
+        });
+      }}
+    >
+      {showReviewForm ? "Close" : "+ Add Review"}
+    </button>
+
+  </div>
+
+  {showReviewForm && (
+
+    <div className="review-form">
+
+      <label>Customer Name</label>
+
+      <input
+        className="profile-input"
+        value={review.customer_name}
+        onChange={(e) =>
+          setReview({
+            ...review,
+            customer_name: e.target.value,
+          })
+        }
+      />
+
+      <label>Review</label>
+
+      <textarea
+        className="profile-textarea"
+        rows="4"
+        value={review.comment}
+        onChange={(e) =>
+          setReview({
+            ...review,
+            comment: e.target.value,
+          })
+        }
+      />
+
+      <label>Rating</label>
+
+      <select
+        className="profile-input"
+        value={review.rating}
+        onChange={(e) =>
+          setReview({
+            ...review,
+            rating: Number(e.target.value),
+          })
+        }
+      >
+        <option value="5">★★★★★ (5)</option>
+        <option value="4">★★★★☆ (4)</option>
+        <option value="3">★★★☆☆ (3)</option>
+        <option value="2">★★☆☆☆ (2)</option>
+        <option value="1">★☆☆☆☆ (1)</option>
+      </select>
+
+      <div className="product-buttons">
+
+        <button
+          className="save-btn"
+          onClick={handleSaveReview}
+        >
+          {editingReviewId ? "Update Review" : "Save Review"}
+        </button>
+
+      </div>
+
+    </div>
+
+  )}
+
+  <div className="review-list">
+
+    {reviews.map((item) => (
+
+      <div
+        className="review-item"
+        key={item.id}
+      >
+
+        <div className="review-info">
+
+          <h3>{item.customer_name}</h3>
+
+          <p>{item.comment}</p>
+
+          <div className="review-stars">
+            {"★".repeat(item.rating)}
+            {"☆".repeat(5 - item.rating)}
+          </div>
+
+        </div>
+
+        <div className="review-actions">
+
+          <button
+            className="save-btn"
+            onClick={() => handleEditReview(item)}
+          >
+            Edit
+          </button>
+
+          <button
+            className="cancel-btn"
+            onClick={() => handleDeleteReview(item.id)}
+          >
+            Delete
+          </button>
+
+        </div>
+
+      </div>
+
+    ))}
+
+  </div>
 
 </div>
 
-      </div>
-    </div>
+</div>
+</div>
+
+      
   );
 }
 

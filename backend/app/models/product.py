@@ -18,4 +18,5 @@ class Product(Base):
 
     description = Column(Text)
 
-    image = Column(String)
+    image = Column(String, nullable=True)
+    

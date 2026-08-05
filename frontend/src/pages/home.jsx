@@ -1,7 +1,8 @@
-import { useState } from "react";
-import { getBackendStatus } from "../api/api";
-import Header from "../components/Header";
+import { useState, useEffect } from "react";
+import { getBackendStatus, getProducts, getProfile,getReviews } from "../api/api";import Header from "../components/Header";
 import "./home.css";
+import Footer from "../components/footer";
+import { QRCodeCanvas } from "qrcode.react";
 
 import storeImage from "../assets/store.jpg";
 import wineImage from "../assets/wine.jpg";
@@ -12,7 +13,46 @@ import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
 function Home() {
   const [message, setMessage] = useState("");
+  const [products, setProducts] = useState([]);
+  const [profile, setProfile] = useState({});
+  const [reviews, setReviews] = useState([]);
+  const [showCard, setShowCard] = useState(false);
 
+
+
+  useEffect(() => {
+  loadProducts();
+  loadProfile();
+  loadReviews();
+
+}, []);
+
+async function loadProducts() {
+  try {
+    const data = await getProducts();
+    setProducts(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function loadProfile() {
+  try {
+    const data = await getProfile();
+    setProfile(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function loadReviews() {
+  try {
+    const data = await getReviews();
+    setReviews(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
   const testBackend = async () => {
     try {
       const data = await getBackendStatus();
@@ -41,16 +81,119 @@ function Home() {
       <main className="home">
 
   <div className="home-container">
-    <img
-      src={storeImage}
-      alt="Shopping in PowerChoice store"
-      className="store-image"
+
+<div className="hero-section">
+
+  <img
+    src={
+      profile.hero_image
+        ? `http://127.0.0.1:8000/uploads/${profile.hero_image}`
+        : storeImage
+    }
+    alt="Store"
+    className="store-image"
+  />
+
+  {/* Text Overlay */}
+  <div className="hero-overlay">
+    <h1>{profile.store_name}</h1>
+
+    <h3>CEO: {profile.ceo_name}</h3>
+
+    <h2>{profile.tagline}</h2>
+
+    <p>{profile.description}</p>
+  </div>
+
+  {/* QR Code */}
+  <div
+    className="hero-qrcode"
+    onClick={() => setShowCard(true)}
+  >
+    <QRCodeCanvas
+      value="https://facebook.com/powerchoice"
+      size={130}
     />
+  
+
+
+
+
+</div>
+{/* Popup Modal */}
+{showCard && (
+  <div
+    className="modal-overlay"
+    onClick={() => setShowCard(false)}
+  >
+    <div
+      className="modal-card"
+      onClick={(e) => e.stopPropagation()}
+    >
+      {/* Store Name */}
+      <h2 className="store-card-header">
+        {profile.store_name}
+      </h2>
+
+      {/* Main Content */}
+      <div className="store-card-body">
+
+        {/* Left Image */}
+        <div className="store-card-left">
+          <div className="image-wrapper">
+            <img
+              src={
+                profile.hero_image
+                  ? `http://127.0.0.1:8000/uploads/${profile.hero_image}`
+                  : storeImage
+              }
+              alt={profile.store_name}
+            />
+          </div>
+        </div>
+
+        {/* QR Code */}
+        <div className="store-card-right">
+          <div className="qr-wrapper">
+            <QRCodeCanvas
+              value="https://facebook.com/powerchoice"
+              size={180}
+            />
+          </div>
+        </div>
+
+      </div>
+
+      {/* Bottom Contact */}
+      <div className="store-contact-bottom">
+
+        <div className="bottom-item">
+          <span className="contact-icon">📧</span>
+          <span>{profile.email || "No email"}</span>
+        </div>
+
+        <div className="bottom-item">
+          <span className="contact-icon">📞</span>
+          <span>{profile.phone || "No phone number"}</span>
+        </div>
+
+        <div className="bottom-item">
+          <span className="contact-icon">📍</span>
+          <span>{profile.address || "No address"}</span>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+)}
+    </div>
+     
 
 
         {/* Facebook */}
         <a
-          href="https://facebook.com/YourProfileName"
+          href={profile.facebook || "#"}
           target="_blank"
           rel="noopener noreferrer"
           className="social-card facebook"
@@ -71,7 +214,7 @@ function Home() {
         {/* TikTok */}
         <a
         
-          href="https://tiktok.com/@YourProfileName"
+          href={profile.tiktok || "#"}
           target="_blank"
           rel="noopener noreferrer"
           className="social-card tiktok"
@@ -86,7 +229,7 @@ function Home() {
 
         {/* Instagram */}
         <a
-          href="https://instagram.com/YourProfileName"
+          href={profile.instagram || "#"}
           target="_blank"
           rel="noopener noreferrer"
           className="social-card instagram"
@@ -106,7 +249,7 @@ function Home() {
 
         {/* X */}
         <a
-          href="https://x.com/YourProfileName"
+          href={profile.twitter || "#"}
           target="_blank"
           rel="noopener noreferrer"
           className="social-card twitter"
@@ -114,6 +257,54 @@ function Home() {
           <span className="social-left">
             <FaXTwitter size={28} />
             Twitter
+          </span>
+
+          <span>➔</span>
+        </a>
+
+                {/* WhatsApp */}
+        <a
+          href={
+            profile.whatsapp
+              ? `https://wa.me/${profile.whatsapp}`
+              : "#"
+          }
+          target="_blank"
+          rel="noopener noreferrer"
+          className="social-card whatsapp"
+        >
+          <span className="social-left">
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
+              alt="WhatsApp"
+              width={28}
+              height={28}
+            />
+            WhatsApp
+          </span>
+
+          <span>➔</span>
+        </a>
+
+        {/* Email */}
+        <a
+          href={profile.email ? `mailto:${profile.email}` : "#"}
+          className="social-card email"
+        >
+          <span className="social-left">
+            📧 Email
+          </span>
+
+          <span>➔</span>
+        </a>
+
+        {/* Phone */}
+        <a
+          href={profile.phone ? `tel:${profile.phone}` : "#"}
+          className="social-card phone"
+        >
+          <span className="social-left">
+            📞 Call Us
           </span>
 
           <span>➔</span>
@@ -134,21 +325,21 @@ function Home() {
               <a
                 key={product.id}
                 href={`https://wa.me/2348012345678?text=${encodeURIComponent(
-                  product.whatsappMessage
+                  `Hi, I am interested in ${product.name}`
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="product-card"
               >
                 <img
-                  src={product.imageUrl}
-                  alt={product.name}
-                  className="product-image"
-                />
+                    src={`http://127.0.0.1:8000/uploads/${product.image}`}
+                    alt={product.name}
+                    className="product-image"
+                  />
 
                 <h4 className="product-name">{product.name}</h4>
 
-                <p className="product-price">${product.price}</p>
+                <p className="product-price">₦{product.price}</p>
               </a>
             ))}
           </div>
@@ -163,33 +354,47 @@ function Home() {
         </div>
         </div>
 
+        <section className="reviews-section">
+
+  <h2 className="reviews-title">
+    Customer Reviews
+  </h2>
+
+  <div className="reviews-grid">
+
+    {reviews.map((item) => (
+
+      <div
+        key={item.id}
+        className="review-card"
+      >
+
+        <div className="review-stars">
+          {"⭐".repeat(item.rating)}
+        </div>
+
+        <p className="review-text">
+          "{item.comment}"
+        </p>
+
+        <h4 className="review-name">
+          {item.customer_name}
+        </h4>
+
+      </div>
+
+    ))}
+
+  </div>
+
+</section>
+
       </main>
+      <Footer profile={profile} />
+
     </>
   );
 }
 
 export default Home;
 
-const products = [
-  {
-    id: 1,
-    name: "Red Wine Bottle",
-    price: 25,
-    imageUrl: wineImage,
-    whatsappMessage: "Hi, I am interested in the Red Wine Bottle",
-  },
-  {
-    id: 2,
-    name: "White Wine Bottle",
-    price: 30,
-    imageUrl: wineImage,
-    whatsappMessage: "Hi, I am interested in the White Wine Bottle",
-  },
-  {
-    id: 3,
-    name: "Rosé Wine Bottle",
-    price: 40,
-    imageUrl: wineImage,
-    whatsappMessage: "Hi, I am interested in the Rosé Wine Bottle",
-  },
-];

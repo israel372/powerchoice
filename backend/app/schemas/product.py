@@ -8,7 +8,7 @@ class ProductBase(BaseModel):
 
 
 class ProductCreate(ProductBase):
-    pass
+    image: str | None = None
 
 
 class ProductResponse(ProductBase):

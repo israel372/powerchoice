@@ -17,8 +17,28 @@ router = APIRouter(
 @router.get("/", response_model=ProfileResponse)
 def get_profile(db: Session = Depends(get_db)):
     profile = db.query(Profile).first()
-    return profile
 
+    if not profile:
+        profile = Profile(
+            store_name="",
+            logo_type="text",
+            logo="",
+            hero_image="",
+            facebook="",
+            instagram="",
+            tiktok="",
+            twitter="",
+            email="",
+            phone="",
+            address="",
+            whatsapp=""
+        )
+
+        db.add(profile)
+        db.commit()
+        db.refresh(profile)
+
+    return profile
 
 @router.post("/", response_model=ProfileResponse)
 def save_profile(
@@ -35,10 +55,20 @@ def save_profile(
         # Update existing profile
         existing_profile.store_name = profile.store_name
         existing_profile.logo_type = profile.logo_type
+
         existing_profile.facebook = profile.facebook
         existing_profile.instagram = profile.instagram
         existing_profile.tiktok = profile.tiktok
         existing_profile.twitter = profile.twitter
+
+        existing_profile.email = profile.email
+        existing_profile.phone = profile.phone
+        existing_profile.address = profile.address
+        existing_profile.whatsapp = profile.whatsapp
+
+        existing_profile.ceo_name = profile.ceo_name
+        existing_profile.tagline = profile.tagline
+        existing_profile.description = profile.description
 
         db.commit()
         db.refresh(existing_profile)
@@ -49,10 +79,19 @@ def save_profile(
     new_profile = Profile(
         store_name=profile.store_name,
         logo_type=profile.logo_type,
+
         facebook=profile.facebook,
         instagram=profile.instagram,
         tiktok=profile.tiktok,
         twitter=profile.twitter,
+        email=profile.email,
+        phone=profile.phone,
+        address=profile.address,
+        whatsapp=profile.whatsapp,
+
+        ceo_name=profile.ceo_name,
+        tagline=profile.tagline,
+        description=profile.description,
     )
 
     db.add(new_profile)
@@ -86,7 +125,14 @@ def upload_logo(
             facebook="",
             instagram="",
             tiktok="",
-            twitter=""
+            twitter="",
+            email="",
+            phone="",
+            address="",
+            whatsapp="",
+            ceo_name="",
+            tagline="",
+            description="",
         )
 
         db.add(profile)
