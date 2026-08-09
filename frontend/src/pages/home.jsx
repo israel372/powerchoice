@@ -11,7 +11,10 @@ import { FaTiktok } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
+import { API } from "../api/api";
+
 function Home() {
+
   const [message, setMessage] = useState("");
   const [products, setProducts] = useState([]);
   const [profile, setProfile] = useState({});
@@ -74,6 +77,7 @@ async function loadReviews() {
     }
   };
 
+
   return (
     <>
       <Header />
@@ -111,7 +115,7 @@ async function loadReviews() {
     onClick={() => setShowCard(true)}
   >
     <QRCodeCanvas
-      value="https://facebook.com/powerchoice"
+      value={`${API}/profile/contact`}
       size={130}
     />
   
@@ -156,7 +160,7 @@ async function loadReviews() {
         <div className="store-card-right">
           <div className="qr-wrapper">
             <QRCodeCanvas
-              value="https://facebook.com/powerchoice"
+              value={`${API}/profile/contact`}
               size={180}
             />
           </div>
@@ -191,125 +195,133 @@ async function loadReviews() {
      
 
 
-        {/* Facebook */}
-        <a
-          href={profile.facebook || "#"}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="social-card facebook"
-        >
-          <span className="social-left">
-            <img
-              src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_(2019).png"
-              alt="Facebook"
-              width={28}
-              height={28}
-            />
-            Facebook
-          </span>
+       {/* Facebook */}
+{profile.facebook?.trim() && (
+  <a
+    href={profile.facebook}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="social-card facebook"
+  >
+    <span className="social-left">
+      <img
+        src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_(2019).png"
+        alt="Facebook"
+        width={28}
+        height={28}
+      />
+      Facebook
+    </span>
 
-          <span>➔</span>
-        </a>
+    <span>➔</span>
+  </a>
+)}
 
-        {/* TikTok */}
-        <a
-        
-          href={profile.tiktok || "#"}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="social-card tiktok"
-        >
-          <span className="social-left">
-            <FaTiktok size={28} />
-            TikTok
-          </span>
+{/* TikTok */}
+{profile.tiktok?.trim() && (
+  <a
+    href={profile.tiktok}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="social-card tiktok"
+  >
+    <span className="social-left">
+      <FaTiktok size={28} />
+      TikTok
+    </span>
 
-          <span>➔</span>
-        </a>
+    <span>➔</span>
+  </a>
+)}
 
-        {/* Instagram */}
-        <a
-          href={profile.instagram || "#"}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="social-card instagram"
-        >
-          <span className="social-left">
-            <img
-              src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png"
-              alt="Instagram"
-              width={28}
-              height={28}
-            />
-            Instagram
-          </span>
+{/* Instagram */}
+{profile.instagram?.trim() && (
+  <a
+    href={profile.instagram}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="social-card instagram"
+  >
+    <span className="social-left">
+      <img
+        src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png"
+        alt="Instagram"
+        width={28}
+        height={28}
+      />
+      Instagram
+    </span>
 
-          <span>➔</span>
-        </a>
+    <span>➔</span>
+  </a>
+)}
 
-        {/* X */}
-        <a
-          href={profile.twitter || "#"}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="social-card twitter"
-        >
-          <span className="social-left">
-            <FaXTwitter size={28} />
-            Twitter
-          </span>
+{/* X (Twitter) */}
+{profile.twitter?.trim() && (
+  <a
+    href={profile.twitter}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="social-card twitter"
+  >
+    <span className="social-left">
+      <FaXTwitter size={28} />
+      Twitter
+    </span>
 
-          <span>➔</span>
-        </a>
+    <span>➔</span>
+  </a>
+)}
 
-                {/* WhatsApp */}
-        <a
-          href={
-            profile.whatsapp
-              ? `https://wa.me/${profile.whatsapp}`
-              : "#"
-          }
-          target="_blank"
-          rel="noopener noreferrer"
-          className="social-card whatsapp"
-        >
-          <span className="social-left">
-            <img
-              src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
-              alt="WhatsApp"
-              width={28}
-              height={28}
-            />
-            WhatsApp
-          </span>
+{/* WhatsApp */}
+{profile.whatsapp?.trim() && (
+  <a
+    href={`https://wa.me/${profile.whatsapp}`}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="social-card whatsapp"
+  >
+    <span className="social-left">
+      <img
+        src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
+        alt="WhatsApp"
+        width={28}
+        height={28}
+      />
+      WhatsApp
+    </span>
 
-          <span>➔</span>
-        </a>
+    <span>➔</span>
+  </a>
+)}
 
-        {/* Email */}
-        <a
-          href={profile.email ? `mailto:${profile.email}` : "#"}
-          className="social-card email"
-        >
-          <span className="social-left">
-            📧 Email
-          </span>
+{/* Email */}
+{profile.email?.trim() && (
+  <a
+    href={`mailto:${profile.email}`}
+    className="social-card email"
+  >
+    <span className="social-left">
+      📧 Email
+    </span>
 
-          <span>➔</span>
-        </a>
+    <span>➔</span>
+  </a>
+)}
 
-        {/* Phone */}
-        <a
-          href={profile.phone ? `tel:${profile.phone}` : "#"}
-          className="social-card phone"
-        >
-          <span className="social-left">
-            📞 Call Us
-          </span>
+{/* Phone */}
+{profile.phone?.trim() && (
+  <a
+    href={`tel:${profile.phone}`}
+    className="social-card phone"
+  >
+    <span className="social-left">
+      📞 Call Us
+    </span>
 
-          <span>➔</span>
-        </a>
-
+    <span>➔</span>
+  </a>
+)}
         {/* Product Carousel */}
         <div className="cart-wrapper">
 
@@ -337,9 +349,27 @@ async function loadReviews() {
                     className="product-image"
                   />
 
-                <h4 className="product-name">{product.name}</h4>
+                <h4 className="product-name">
+                  {product.name}
+                </h4>
 
-                <p className="product-price">₦{product.price}</p>
+                <div className="product-pricing">
+
+                  <p className="old-price">
+                    ₦{Number(product.original_price).toLocaleString()}
+                  </p>
+
+                  <p className="new-price">
+                    ₦{Number(product.price).toLocaleString()}
+                  </p>
+
+                  {product.discount > 0 && (
+                    <span className="discount-badge">
+                      {product.discount}% OFF
+                    </span>
+                  )}
+
+                </div>
               </a>
             ))}
           </div>
@@ -354,6 +384,7 @@ async function loadReviews() {
         </div>
         </div>
 
+        {/*
         <section className="reviews-section">
 
   <h2 className="reviews-title">
@@ -388,6 +419,7 @@ async function loadReviews() {
   </div>
 
 </section>
+*/}
 
       </main>
       <Footer profile={profile} />

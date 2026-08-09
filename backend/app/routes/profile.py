@@ -6,6 +6,8 @@ from app.models.profile import Profile
 from app.schemas.profile import ProfileCreate, ProfileResponse
 from fastapi import UploadFile, File
 from app.services.upload_service import save_image
+from fastapi.responses import Response
+from fastapi import HTTPException
 
 
 router = APIRouter(
@@ -171,3 +173,40 @@ def upload_hero(
 
 
 
+@router.get("/contact")
+def download_contact(db: Session = Depends(get_db)):
+
+    profile = db.query(Profile).first()
+
+    if not profile:
+        raise HTTPException(status_code=404, detail="Profile not found")
+
+    # Change this to your real website
+    website = "http://127.0.0.1:5173"
+
+    hero = ""
+
+    if profile.hero_image:
+        hero = f"http://127.0.0.1:8000/uploads/{profile.hero_image}"
+
+    vcard = f"""BEGIN:VCARD
+VERSION:3.0
+FN:{profile.store_name}
+ORG:{profile.store_name}
+TITLE:{profile.ceo_name}
+TEL;TYPE=CELL:{profile.phone}
+EMAIL:{profile.email}
+ADR:;;{profile.address}
+URL:{website}
+PHOTO;VALUE=URI:{hero}
+NOTE:{profile.description}
+END:VCARD
+"""
+
+    return Response(
+        content=vcard,
+        media_type="text/vcard",
+        headers={
+            "Content-Disposition": f'attachment; filename="{profile.store_name}.vcf"'
+        },
+    )

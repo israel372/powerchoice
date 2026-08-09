@@ -25,11 +25,13 @@ def create_product(
     db: Session = Depends(get_db)
 ):
     new_product = Product(
-        name=product.name,
-        price=product.price,
-        description=product.description,
-        image=product.image,
-    )
+                name=product.name,
+                original_price=product.original_price,
+                discount=product.discount,
+                price=product.price,
+                description=product.description,
+                image=product.image,
+)
 
     db.add(new_product)
     db.commit()
@@ -76,10 +78,11 @@ def update_product(
         raise HTTPException(status_code=404, detail="Product not found")
 
     db_product.name = product.name
+    db_product.original_price = product.original_price
+    db_product.discount = product.discount
     db_product.price = product.price
     db_product.description = product.description
     db_product.image = product.image
-
     db.commit()
     db.refresh(db_product)
 

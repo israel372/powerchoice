@@ -61,7 +61,6 @@ function Header() {
           <ul className="nav-links">
             <li><a href="#">Home</a></li>
             <li><a href="#">Product</a></li>
-            <li><a href="#">Cart</a></li>
           </ul>
 
           {/* Mobile Menu Button */}
@@ -79,7 +78,6 @@ function Header() {
           <div className="mobile-menu">
             <a href="#">Home</a>
             <a href="#">Product</a>
-            <a href="#">Cart</a>
           </div>
         )}
 

@@ -28,7 +28,8 @@ function Dashboard() {
 
 const [product, setProduct] = useState({
   name: "",
-  price: "",
+  original_price: "",
+  discount:"",
   description: "",
   image: "",
 });
@@ -186,19 +187,31 @@ async function handleProductImageUpload(e) {
 
 async function handleSaveProduct() {
   try {
-    if (editingProductId) {
-      await updateProduct(editingProductId, product);
+    const sellingPrice =
+      product.original_price -
+      (product.original_price * product.discount) / 100;
 
+    const productData = {
+      name: product.name,
+      original_price: Number(product.original_price),
+      discount: Number(product.discount),
+      price: sellingPrice,
+      description: product.description,
+      image: product.image,
+    };
+
+    if (editingProductId) {
+      await updateProduct(editingProductId, productData);
       alert("Product updated successfully!");
     } else {
-      await createProduct(product);
-
+      await createProduct(productData);
       alert("Product created successfully!");
     }
 
     setProduct({
       name: "",
-      price: "",
+      original_price: "",
+      discount: "",
       description: "",
       image: "",
     });
@@ -207,18 +220,11 @@ async function handleSaveProduct() {
     setShowProductForm(false);
 
     loadProducts();
-
   } catch (error) {
     console.error(error);
     alert("Operation failed.");
   }
 }
-
-function handleEditProduct(product) {
-  alert("Editing: " + product.name);
-}
-
-
 
 
 async function handleDeleteProduct(id) {
@@ -294,6 +300,15 @@ async function handleDeleteReview(id) {
 }
 
 
+{/* calculate price for product */}
+const calculatePrice = () => {
+  if (!product.original_price) return 0;
+
+  return Math.round(
+    product.original_price -
+      (product.original_price * product.discount) / 100
+  );
+};
 
 return (
     <div className="profile-page">
@@ -496,19 +511,19 @@ return (
 </div>
 
         {/* Social & Contact */}
-
 <div className="settings-card social-card">
 
   <h2>Social & Contact</h2>
 
   <div className="social-grid">
 
+    {/* Facebook */}
     <div>
       <label>Facebook</label>
       <input
         className="profile-input"
         placeholder="https://facebook.com/..."
-        value={profile.facebook}
+        value={profile.facebook || ""}
         onChange={(e) =>
           setProfile({
             ...profile,
@@ -518,12 +533,13 @@ return (
       />
     </div>
 
+    {/* Instagram */}
     <div>
       <label>Instagram</label>
       <input
         className="profile-input"
         placeholder="https://instagram.com/..."
-        value={profile.instagram}
+        value={profile.instagram || ""}
         onChange={(e) =>
           setProfile({
             ...profile,
@@ -533,12 +549,13 @@ return (
       />
     </div>
 
+    {/* TikTok */}
     <div>
       <label>TikTok</label>
       <input
         className="profile-input"
         placeholder="https://tiktok.com/..."
-        value={profile.tiktok}
+        value={profile.tiktok || ""}
         onChange={(e) =>
           setProfile({
             ...profile,
@@ -548,12 +565,13 @@ return (
       />
     </div>
 
+    {/* X (Twitter) */}
     <div>
       <label>X (Twitter)</label>
       <input
         className="profile-input"
         placeholder="https://x.com/..."
-        value={profile.twitter}
+        value={profile.twitter || ""}
         onChange={(e) =>
           setProfile({
             ...profile,
@@ -563,12 +581,13 @@ return (
       />
     </div>
 
+    {/* WhatsApp */}
     <div>
       <label>WhatsApp Number</label>
       <input
         className="profile-input"
         placeholder="2348012345678"
-        value={profile.whatsapp}
+        value={profile.whatsapp || ""}
         onChange={(e) =>
           setProfile({
             ...profile,
@@ -578,13 +597,14 @@ return (
       />
     </div>
 
+    {/* Email */}
     <div>
       <label>Email Address</label>
       <input
         type="email"
         className="profile-input"
         placeholder="example@gmail.com"
-        value={profile.email}
+        value={profile.email || ""}
         onChange={(e) =>
           setProfile({
             ...profile,
@@ -594,13 +614,14 @@ return (
       />
     </div>
 
+    {/* Phone */}
     <div>
       <label>Phone Number</label>
       <input
         type="tel"
         className="profile-input"
         placeholder="+234 801 234 5678"
-        value={profile.phone}
+        value={profile.phone || ""}
         onChange={(e) =>
           setProfile({
             ...profile,
@@ -613,6 +634,7 @@ return (
   </div>
 
 </div>
+    
 
 
 
@@ -690,9 +712,17 @@ return (
          <div className="product-info">
       <h3>{item.name}</h3>
 
-      <p className="product-price">
-        ₦{item.price}
-      </p>
+      <p className="old-price">
+          ₦{Number(item.original_price).toLocaleString()}
+        </p>
+
+        <p className="new-price">
+          ₦{Number(item.price).toLocaleString()}
+        </p>
+
+        <p className="discount">
+          {item.discount}% OFF
+        </p>
 
       <p className="product-description">
         {item.description}
@@ -706,7 +736,8 @@ return (
             onClick={() => {
               setProduct({
                 name: item.name,
-                price: item.price,
+                original_price: item.original_price,
+                discount: item.discount,
                 description: item.description,
                 image: item.image,
               });
@@ -764,34 +795,54 @@ return (
       
 
 
+      <input
+            type="text"
+            className="profile-input"
+            placeholder="Product Name"
+            value={product.name}
+            onChange={(e) =>
+              setProduct({
+                ...product,
+                name: e.target.value,
+              })
+            }
+          />
 
       <input
-        type="text"
-        className="profile-input"
-        placeholder="Product Name"
-        value={product.name}
-        onChange={(e) =>
-          setProduct({
-            ...product,
-            name: e.target.value,
-          })
-        }
-      />
+            type="number"
+            className="profile-input"
+            placeholder="Original Price"
+            value={product.original_price}
+            onChange={(e) =>
+              setProduct({
+                ...product,
+                original_price: e.target.value,
+              })
+            }
+          />
 
+          <input
+            type="number"
+            className="profile-input"
+            placeholder="Discount (%)"
+            value={product.discount}
+            onChange={(e) =>
+              setProduct({
+                ...product,
+                discount: e.target.value,
+              })
+            }
+          />
 
-
-      <input
-        type="number"
-        className="profile-input"
-        placeholder="Price"
-        value={product.price}
-        onChange={(e) =>
-          setProduct({
-            ...product,
-            price: e.target.value,
-          })
-        }
-      />
+          <p
+              style={{
+                fontWeight: "bold",
+                color: "#d60000",
+                marginTop: "10px",
+              }}
+            >
+              Selling Price: ₦{calculatePrice().toLocaleString()}
+            </p>
 
 
 
@@ -828,7 +879,8 @@ return (
 
               setProduct({
                 name: "",
-                price: "",
+                original_price: "",
+                discount: "",
                 description: "",
                 image: "",
               });

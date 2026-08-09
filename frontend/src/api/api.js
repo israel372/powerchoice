@@ -190,3 +190,6 @@ export async function deleteReview(id) {
     method: "DELETE",
   });
 }
+
+
+export const API = "http://127.0.0.1:8000";

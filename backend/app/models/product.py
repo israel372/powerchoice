@@ -14,6 +14,10 @@ class Product(Base):
 
     name = Column(String)
 
+    original_price = Column(Float)
+
+    discount = Column(Float, default=0)
+
     price = Column(Float)
 
     description = Column(Text)
