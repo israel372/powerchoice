@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
-import { getProfile } from "../api/api";
+import { getProfile, API } from "../api/api";
 import "./header.css";
+
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -31,7 +32,7 @@ function Header() {
   {/* IMAGE ONLY */}
   {profile.logo_type === "image" && profile.logo && (
     <img
-      src={`http://127.0.0.1:8000/uploads/${profile.logo}`}
+      src={`${API}/uploads/${profile.logo}`}
       alt="Logo"
       className="header-logo"
     />
@@ -46,7 +47,7 @@ function Header() {
   {profile.logo_type === "both" && (
     <>
       <img
-        src={`http://127.0.0.1:8000/uploads/${profile.logo}`}
+        src={`${API}/uploads/${profile.logo}`}
         alt="Logo"
         className="header-logo"
       />

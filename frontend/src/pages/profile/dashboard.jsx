@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import "./dashboard.css";
-import { getProfile, saveProfile,uploadLogo,uploadHero,uploadProductImage,createProduct,getProducts,deleteProduct,updateProduct,createReview,getReviews, updateReview,deleteReview, } from "../../api/api";
+import { getProfile, saveProfile,uploadLogo,uploadHero,uploadProductImage,createProduct,getProducts,deleteProduct,updateProduct,createReview,getReviews, updateReview,deleteReview, API } from "../../api/api";
 
 function Dashboard() {
   const [profile, setProfile] = useState({
@@ -413,7 +413,7 @@ return (
             <div className="logo-preview">
                 {profile.logo ? (
                   <img
-                    src={`http://127.0.0.1:8000/uploads/${profile.logo}`}
+                    src={`${API}/uploads/${profile.logo}`}
                     alt="Logo"
                     className="preview-image"
                   />
@@ -443,7 +443,7 @@ return (
   <div className="image-preview">
     {profile.hero_image ? (
       <img
-        src={`http://127.0.0.1:8000/uploads/${profile.hero_image}`}
+        src={`${API}/uploads/${profile.hero_image}`}
         alt="Hero"
         className="preview-image"
       />
@@ -702,7 +702,7 @@ return (
         <div className="product-image">
 
           <img
-            src={`http://127.0.0.1:8000/uploads/${item.image}`}
+            src={`${API}/uploads/${item.image}`}
             alt={item.name}
             className="preview-image"
           />
@@ -780,7 +780,7 @@ return (
         {product.image ? (
 
           <img
-            src={`http://127.0.0.1:8000/uploads/${product.image}`}
+            src={`${API}/uploads/${product.image}`}
             alt="Product"
             className="preview-image"
           />

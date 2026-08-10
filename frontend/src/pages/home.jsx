@@ -91,7 +91,7 @@ async function loadReviews() {
   <img
     src={
       profile.hero_image
-        ? `http://127.0.0.1:8000/uploads/${profile.hero_image}`
+        ? `${API}/uploads/${profile.hero_image}`
         : storeImage
     }
     alt="Store"
@@ -148,7 +148,7 @@ async function loadReviews() {
             <img
               src={
                 profile.hero_image
-                  ? `http://127.0.0.1:8000/uploads/${profile.hero_image}`
+                  ? `${API}/uploads/${profile.hero_image}`
                   : storeImage
               }
               alt={profile.store_name}
@@ -344,7 +344,7 @@ async function loadReviews() {
                 className="product-card"
               >
                 <img
-                    src={`http://127.0.0.1:8000/uploads/${product.image}`}
+                    src={`${API}/uploads/${product.image}`}
                     alt={product.name}
                     className="product-image"
                   />
