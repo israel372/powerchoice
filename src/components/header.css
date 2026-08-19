@@ -1,0 +1,211 @@
+/* ================= Header ================= */
+
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: purple;
+  z-index: 1000;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.container {
+  width: 1200px;
+  max-width: 95%;
+  margin: 0 auto;
+}
+
+/* ================= Navigation ================= */
+
+nav {
+  height: 80px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ================= Logo ================= */
+
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.header-logo {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #FFD700;
+  flex-shrink: 0;
+}
+
+.logo-area h1 {
+  color: #FFD700;
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+
+  flex: 1;
+  min-width: 0;
+
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ================= Desktop Menu ================= */
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  gap: 35px;
+}
+
+.nav-links li {
+  list-style: none;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #FFD700;
+  font-size: 17px;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.nav-links a:hover {
+  color: white;
+}
+
+/* ================= Menu Button ================= */
+
+.menu-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  color: #FFD700;
+  font-size: 30px;
+  cursor: pointer;
+}
+
+/* ================= Mobile Menu ================= */
+
+.mobile-menu {
+  display: none;
+}
+
+/* ================= Tablet ================= */
+
+@media (max-width: 900px) {
+
+  nav {
+    height: 75px;
+  }
+
+  .header-logo {
+    width: 48px;
+    height: 48px;
+  }
+
+  .logo-area h1 {
+    font-size: 1rem;
+  }
+
+  .nav-links {
+    gap: 25px;
+  }
+
+}
+
+/* ================= Mobile ================= */
+
+@media (max-width: 768px) {
+
+  nav {
+    height: 65px;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .menu-btn {
+    display: block;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  .logo-area {
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+    max-width: calc(100% - 50px);
+  }
+
+  .header-logo {
+    width: 38px;
+    height: 38px;
+  }
+
+  .logo-area h1 {
+    font-size: 0.82rem;
+  }
+
+  .mobile-menu {
+    display: flex;
+    flex-direction: column;
+    background: purple;
+    width: 100%;
+  }
+
+  .mobile-menu a {
+    text-decoration: none;
+    color: #FFD700;
+    padding: 16px;
+    text-align: center;
+    border-top: 1px solid rgba(255,255,255,.2);
+    font-weight: 600;
+    transition: .3s;
+  }
+
+  .mobile-menu a:hover {
+    background: rgba(255,255,255,.1);
+    color: white;
+  }
+
+}
+
+/* ================= Small Phones ================= */
+
+@media (max-width: 480px) {
+
+  nav {
+    height: 60px;
+  }
+
+  .header-logo {
+    width: 34px;
+    height: 34px;
+  }
+
+  .logo-area {
+    gap: 6px;
+    max-width: calc(100% - 45px);
+  }
+
+  .logo-area h1 {
+    font-size: 0.72rem;
+  }
+
+  .menu-btn {
+    font-size: 22px;
+  }
+
+}
