@@ -1,5 +1,5 @@
 import "./footer.css";
-import { API } from "../api/api";
+import { getUploadUrl } from "../api/api";
 
 function Footer({ profile }) {
   return (
@@ -10,7 +10,7 @@ function Footer({ profile }) {
         <div className="footer-brand">
           {profile?.logo_type === "image" && profile?.logo && (
             <img
-              src={`${API}/uploads/${profile.logo}`}
+              src={getUploadUrl(profile.logo)}
               alt="Logo"
               className="footer-logo"
             />
@@ -24,7 +24,7 @@ function Footer({ profile }) {
             <>
               {profile.logo && (
                 <img
-                  src={`${API}/uploads/${profile.logo}`}
+                  src={getUploadUrl(profile.logo)}
                   alt="Logo"
                   className="footer-logo"
                 />
