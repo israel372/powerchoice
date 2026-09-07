@@ -1,19 +1,40 @@
-import os
-import shutil
-from uuid import uuid4
+import uuid
+
+from app.services.supabase import supabase
 
 
-UPLOAD_FOLDER = "app/uploads"
+BUCKET_NAME = "powerchoice-images"
 
 
-def save_image(file):
-    extension = file.filename.split(".")[-1]
+def save_image(file, folder):
+    try:
+        # Read uploaded file
+        file_bytes = file.file.read()
 
-    filename = f"{uuid4()}.{extension}"
+        # Create unique filename
+        filename = f"{uuid.uuid4()}_{file.filename}"
 
-    filepath = os.path.join(UPLOAD_FOLDER, filename)
+        # Path inside Supabase Storage
+        path = f"{folder}/{filename}"
 
-    with open(filepath, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+        # Upload to Supabase
+        supabase.storage.from_(BUCKET_NAME).upload(
+            path,
+            file_bytes,
+            {
+                "content-type": file.content_type,
+                "upsert": "true",
+            }
+        )
 
-    return filename
+        # Get public URL
+        url = supabase.storage.from_(BUCKET_NAME).get_public_url(path)
+
+        return {
+            "filename": filename,
+            "path": path,
+            "url": url,
+        }
+
+    except Exception as e:
+        raise Exception(f"Image upload failed: {str(e)}")

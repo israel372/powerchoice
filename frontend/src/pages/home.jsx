@@ -11,7 +11,8 @@ import { FaTiktok } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
-import { API } from "../api/api";
+import { API, getUploadUrl } from "../api/api";
+
 
 function Home() {
 
@@ -89,11 +90,7 @@ async function loadReviews() {
 <div className="hero-section">
 
   <img
-    src={
-      profile.hero_image
-        ? `${API}/uploads/${profile.hero_image}`
-        : storeImage
-    }
+     src={getUploadUrl(profile.hero_image)}
     alt="Store"
     className="store-image"
   />
@@ -146,11 +143,7 @@ async function loadReviews() {
         <div className="store-card-left">
           <div className="image-wrapper">
             <img
-              src={
-                profile.hero_image
-                  ? `${API}/uploads/${profile.hero_image}`
-                  : storeImage
-              }
+               src={getUploadUrl(profile.hero_image)}
               alt={profile.store_name}
             />
           </div>
@@ -344,7 +337,7 @@ async function loadReviews() {
                 className="product-card"
               >
                 <img
-                    src={`${API}/uploads/${product.image}`}
+                    src={getUploadUrl(product.image)}
                     alt={product.name}
                     className="product-image"
                   />

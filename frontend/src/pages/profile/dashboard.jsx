@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import "./dashboard.css";
-import { getProfile, saveProfile,uploadLogo,uploadHero,uploadProductImage,createProduct,getProducts,deleteProduct,updateProduct,createReview,getReviews, updateReview,deleteReview, API } from "../../api/api";
+import { getProfile, saveProfile,uploadLogo,uploadHero,uploadProductImage,createProduct,getProducts,deleteProduct,updateProduct,createReview,getReviews, updateReview,deleteReview, getUploadUrl } from "../../api/api";
+
+
 
 function Dashboard() {
   const [profile, setProfile] = useState({
@@ -121,7 +123,7 @@ async function handleLogoUpload(e) {
 
     setProfile((prev) => ({
       ...prev,
-      logo: result.filename,
+      logo: result.url,
       logo_type: "image",
     }));
 
@@ -146,7 +148,7 @@ async function handleHeroUpload(e) {
 
     setProfile((prev) => ({
       ...prev,
-      hero_image: result.filename,
+      hero_image: result.url,
     }));
 
     alert("Hero image uploaded successfully!");
@@ -171,7 +173,7 @@ async function handleProductImageUpload(e) {
 
     setProduct((prev) => ({
       ...prev,
-      image: result.filename,
+      image: result.url,
     }));
 
     alert("Product image uploaded successfully!");
@@ -413,7 +415,7 @@ return (
             <div className="logo-preview">
                 {profile.logo ? (
                   <img
-                    src={`${API}/uploads/${profile.logo}`}
+                    src={getUploadUrl(profile.logo)}
                     alt="Logo"
                     className="preview-image"
                   />
@@ -443,7 +445,7 @@ return (
   <div className="image-preview">
     {profile.hero_image ? (
       <img
-        src={`${API}/uploads/${profile.hero_image}`}
+        src={getUploadUrl(profile.hero_image)}
         alt="Hero"
         className="preview-image"
       />
@@ -702,7 +704,7 @@ return (
         <div className="product-image">
 
           <img
-            src={`${API}/uploads/${item.image}`}
+            src={getUploadUrl(item.image)}
             alt={item.name}
             className="preview-image"
           />
@@ -780,7 +782,7 @@ return (
         {product.image ? (
 
           <img
-            src={`${API}/uploads/${product.image}`}
+            src={getUploadUrl(product.image)}
             alt="Product"
             className="preview-image"
           />

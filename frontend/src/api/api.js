@@ -197,5 +197,14 @@ export async function deleteReview(id) {
 export const API = API_BASE;
 
 // Helper for uploaded files/images
-export const getUploadUrl = (filename) =>
-  `${API_BASE}/uploads/${filename}`;
+export const getUploadUrl = (filename) => {
+  if (!filename) return "";
+
+  // Supabase already gives us the complete public URL
+  if (filename.startsWith("http://") || filename.startsWith("https://")) {
+    return filename;
+  }
+
+  // Keep support for older/local uploaded files
+  return `${API_BASE}/uploads/${filename}`;
+};

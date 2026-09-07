@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
-import { getProfile, API } from "../api/api";
+import { getProfile, getUploadUrl } from "../api/api";
 import "./header.css";
 
 
@@ -32,7 +32,7 @@ function Header() {
   {/* IMAGE ONLY */}
   {profile.logo_type === "image" && profile.logo && (
     <img
-      src={`${API}/uploads/${profile.logo}`}
+      src={getUploadUrl(profile.logo)}
       alt="Logo"
       className="header-logo"
     />
@@ -47,7 +47,7 @@ function Header() {
   {profile.logo_type === "both" && (
     <>
       <img
-        src={`${API}/uploads/${profile.logo}`}
+        src={getUploadUrl(profile.logo)}
         alt="Logo"
         className="header-logo"
       />

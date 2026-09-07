@@ -8,6 +8,8 @@ class Profile(Base):
 
     id = Column(Integer, primary_key=True, index=True)
 
+    profile_token = Column(String, unique=True, nullable=True, index=True)
+
     store_name = Column(String)
 
     logo_type = Column(String)
@@ -37,3 +39,5 @@ class Profile(Base):
     tagline = Column(String, default="")
 
     description = Column(String, default="")
+
+    

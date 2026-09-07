@@ -10,7 +10,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/profile" element={<Dashboard />} />
+        <Route path="/profile/:profileToken" element={<Dashboard />} />
       </Routes>
     </BrowserRouter>
   );

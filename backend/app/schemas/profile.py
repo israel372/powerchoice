@@ -28,6 +28,7 @@ class ProfileResponse(ProfileBase):
     id: int
     logo: str | None = None
     hero_image: str | None = None
+    profile_token: str | None = None
 
     class Config:
         from_attributes = True

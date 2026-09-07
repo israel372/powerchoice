@@ -53,16 +53,17 @@ def delete_product(product_id: int, db: Session = Depends(get_db)):
 
     return {"message": "Product deleted successfully"}
 
+
+
 @router.post("/upload")
 def upload_product_image(file: UploadFile = File(...)):
-    filename = save_image(file)
+
+    image = save_image(file, folder="products")
 
     return {
-        "message": "Image uploaded successfully",
-        "filename": filename,
-        "url": f"/uploads/{filename}"
-    }
-
+    "message": "Image uploaded successfully",
+    "url": image["url"]
+}
 
 
 

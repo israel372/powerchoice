@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+import secrets
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -15,32 +16,6 @@ router = APIRouter(
     tags=["Profile"]
 )
 
-
-@router.get("/", response_model=ProfileResponse)
-def get_profile(db: Session = Depends(get_db)):
-    profile = db.query(Profile).first()
-
-    if not profile:
-        profile = Profile(
-            store_name="",
-            logo_type="text",
-            logo="",
-            hero_image="",
-            facebook="",
-            instagram="",
-            tiktok="",
-            twitter="",
-            email="",
-            phone="",
-            address="",
-            whatsapp=""
-        )
-
-        db.add(profile)
-        db.commit()
-        db.refresh(profile)
-
-    return profile
 
 @router.post("/", response_model=ProfileResponse)
 def save_profile(
@@ -79,6 +54,7 @@ def save_profile(
 
     # Create new profile
     new_profile = Profile(
+        profile_token=secrets.token_urlsafe(32),
         store_name=profile.store_name,
         logo_type=profile.logo_type,
 
@@ -108,21 +84,23 @@ def upload_logo(
     file: UploadFile = File(...),
     db: Session = Depends(get_db)
 ):
-    # Save image inside app/uploads
-    filename = save_image(file)
+    # Upload to Supabase
+    image = save_image(file, folder="logos")
 
     # Find existing profile
     profile = db.query(Profile).first()
 
     if profile:
-        profile.logo = filename
+        profile.logo = image["url"]
+
         db.commit()
         db.refresh(profile)
+
     else:
         profile = Profile(
             store_name="",
             logo_type="image",
-            logo=filename,
+            logo=image["url"],
             hero_image="",
             facebook="",
             instagram="",
@@ -143,9 +121,10 @@ def upload_logo(
 
     return {
         "message": "Logo uploaded successfully",
-        "filename": filename,
-        "url": f"/uploads/{filename}"
+        "url": image["url"],
     }
+
+
 
 
 @router.post("/hero")
@@ -153,25 +132,58 @@ def upload_hero(
     file: UploadFile = File(...),
     db: Session = Depends(get_db)
 ):
-    filename = save_image(file)
+    image = save_image(file, folder="hero")
 
     profile = db.query(Profile).first()
 
     if not profile:
-        profile = Profile()
+        profile = Profile(
+            store_name="",
+            logo_type="text",
+            logo="",
+            hero_image="",
+            facebook="",
+            instagram="",
+            tiktok="",
+            twitter="",
+            email="",
+            phone="",
+            address="",
+            whatsapp="",
+            ceo_name="",
+            tagline="",
+            description="",
+        )
+
         db.add(profile)
 
-    profile.hero_image = filename
+    # SAVE ONLY THE SUPABASE URL
+    profile.hero_image = image["url"]
 
     db.commit()
+    db.refresh(profile)
 
     return {
         "message": "Hero image uploaded successfully",
-        "filename": filename,
-        "url": f"/uploads/{filename}"
-    }
+        "url": image["url"],
+    }  
 
 
+
+
+@router.get("/", response_model=ProfileResponse)
+def get_current_profile(
+    db: Session = Depends(get_db)
+):
+    profile = db.query(Profile).first()
+
+    if not profile:
+        raise HTTPException(
+            status_code=404,
+            detail="Profile not found"
+        )
+
+    return profile
 
 @router.get("/contact")
 def download_contact(db: Session = Depends(get_db)):
@@ -187,7 +199,7 @@ def download_contact(db: Session = Depends(get_db)):
     hero = ""
 
     if profile.hero_image:
-        hero = f"http://127.0.0.1:8000/uploads/{profile.hero_image}"
+        hero = profile.hero_image
 
     vcard = f"""BEGIN:VCARD
 VERSION:3.0
@@ -210,3 +222,22 @@ END:VCARD
             "Content-Disposition": f'attachment; filename="{profile.store_name}.vcf"'
         },
     )
+
+
+
+@router.get("/{profile_token}", response_model=ProfileResponse)
+def get_profile(
+    profile_token: str,
+    db: Session = Depends(get_db)
+):
+    profile = db.query(Profile).filter(
+        Profile.profile_token == profile_token
+    ).first()
+
+    if not profile:
+        raise HTTPException(
+            status_code=404,
+            detail="Profile not found"
+        )
+
+    return profile
