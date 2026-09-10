@@ -3,7 +3,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import Base, engine
-from app.routes import profile, product, review
+from app.routes import profile, product, review, referral
 
 
 
@@ -40,6 +40,8 @@ Base.metadata.create_all(bind=engine)
 app.include_router(profile.router)
 app.include_router(product.router)
 app.include_router(review.router)
+app.include_router(referral.router)
+
 
 
 @app.get("/")

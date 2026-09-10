@@ -1,0 +1,9 @@
+{
+  "referrals": [
+    {
+      "code": "ABC123",
+      "active": true,
+      "name": "Test Referral"
+    }
+  ]
+}
